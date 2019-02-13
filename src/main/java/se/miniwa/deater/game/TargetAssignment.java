@@ -5,7 +5,7 @@ import java.util.*;
 public class TargetAssignment {
     private Map<Player, Player> targetMap;
 
-    public TargetAssignment(Map<Player, Player> targetMap) {
+    private TargetAssignment(Map<Player, Player> targetMap) {
         this.targetMap = targetMap;
     }
 

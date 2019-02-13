@@ -1,38 +1,62 @@
 package se.miniwa.deater;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
+import se.miniwa.deater.cli.AppArgs;
+import se.miniwa.deater.game.Players;
 import se.miniwa.deater.game.TargetAssignment;
 import se.miniwa.deater.game.Player;
 import se.miniwa.deater.game.PlayerTarget;
 
-import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.annotation.Target;
 
 public class App {
     public static void main(String[] args) {
+        AppArgs appArgs = new AppArgs();
+        JCommander argParser = JCommander.newBuilder()
+                .addObject(appArgs)
+                .programName("deater")
+                .build();
+
+        try {
+            argParser.parse(args);
+        } catch(ParameterException ex) {
+            argParser.usage();
+            System.exit(1);
+            return;
+        }
+
         Player[] players;
         try {
-            Gson gson = new Gson();
-            Reader reader = new FileReader("players.json");
-            players = gson.fromJson(reader, Player[].class);
-        } catch(IOException ex) {
+            players = Players.fromFile(appArgs.playerFile);
+        } catch(FileNotFoundException ex) {
+            System.out.println("Could not find file: " + appArgs.playerFile.getAbsolutePath());
+            System.exit(1);
+            return;
+        } catch(JsonParseException ex) {
             ex.printStackTrace();
             System.exit(1);
             return;
         }
 
+        // Build target assignment for game.
+        Player first = players[0];
         TargetAssignment targets = TargetAssignment.builder()
                 .addPlayers(players)
                 .randomize()
                 .build();
 
-        for(PlayerTarget playerTarget : targets.getChain(players[0])) {
+        masterMode(targets, first);
+    }
+
+    public static void masterMode(TargetAssignment targets, Player first) {
+        for(PlayerTarget playerTarget : targets.getChain(first)) {
             System.out.println(playerTarget.getPlayer().getName() + " --> " +
-            playerTarget.getTarget().getName());
+                    playerTarget.getTarget().getName());
         }
     }
 }
