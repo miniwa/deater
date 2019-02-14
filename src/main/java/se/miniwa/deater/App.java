@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import org.simplejavamail.email.Email;
 import se.miniwa.deater.cli.AppArgs;
 import se.miniwa.deater.game.Players;
 import se.miniwa.deater.game.TargetAssignment;
@@ -13,6 +14,7 @@ import se.miniwa.deater.game.PlayerTarget;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.annotation.Target;
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
@@ -58,5 +60,9 @@ public class App {
             System.out.println(playerTarget.getPlayer().getName() + " --> " +
                     playerTarget.getTarget().getName());
         }
+    }
+
+    public static List<Email> buildEmails(TargetAssignment targets, Player first) {
+
     }
 }
