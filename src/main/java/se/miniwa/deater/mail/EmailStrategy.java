@@ -19,26 +19,13 @@ public class EmailStrategy {
         this.retryDelay = retryDelay;
     }
 
-    public boolean addressIsValid(String address) {
-        return EmailAddressValidator.isValid(address, mailer.getEmailAddressCriteria());
-    }
-
     public void send(Iterable<Email> emails) throws EmailException {
-        for(Email email : emails) {
-            for(Recipient recipient : email.getRecipients()) {
-                if(!addressIsValid(recipient.getAddress())) {
-                    throw new InvalidEmailAddressException(
-                            String.format("Recipient address '%s' is invalid.", recipient.getAddress()));
-                }
-            }
-        }
-
         for(Email email : emails) {
             send(email);
         }
     }
 
-    private void send(Email email) throws EmailException {
+    public void send(Email email) throws EmailException {
         boolean done = false;
         MailException lastEx = null;
         for(int i = 0; i < retryCount; i++) {
@@ -52,6 +39,10 @@ public class EmailStrategy {
                 } catch(InterruptedException interruptedEx) {
                     // Sleep was canceled. Just continue to retry.
                 }
+            }
+
+            if(done) {
+                break;
             }
         }
 

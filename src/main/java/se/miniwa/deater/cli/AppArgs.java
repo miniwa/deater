@@ -8,5 +8,9 @@ import java.io.File;
 public class AppArgs {
     @Parameter(names ={"--players-file", "-f"}, required = true, converter = FileConverter.class,
             description = "Path to json file containing player information")
-    public File playerFile;
+    private File playerFile;
+
+    public File getPlayerFile() {
+        return playerFile;
+    }
 }

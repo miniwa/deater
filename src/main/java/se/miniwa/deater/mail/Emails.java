@@ -10,7 +10,13 @@ import java.util.List;
 public final class Emails {
     private Emails() {}
 
-    public static List<Email> buildTargetEmails(Iterable<PlayerTarget> targets) throws InvalidEmailAddressException {
+    public static List<Email> buildTargetNotificationEmails(String subject, String fromName, String fromAddress,
+                                                            Iterable<PlayerTarget> targets)
+            throws InvalidEmailAddressException {
+        if(!EmailAddress.isValid(fromAddress)) {
+            throw new InvalidEmailAddressException(String.format("From address '%s' is not valid.", fromAddress));
+        }
+
         List<Email> emails = new ArrayList<>();
         for(PlayerTarget playerTarget : targets) {
             String name = playerTarget.getPlayer().getName();
@@ -20,9 +26,17 @@ public final class Emails {
                 throw new InvalidEmailAddressException(msg);
             }
 
+            if(!EmailAddress.isValid(address)) {
+                String msg = String.format("Email address '%s' for player '%s' is invalid.", address, name);
+                throw new InvalidEmailAddressException(msg);
+            }
+
             Email email = EmailBuilder.startingBlank()
-                    .to(address)
-                    .withSubject("Death Eater Game")
+                    .to(name, address)
+                    .from(fromName, fromAddress)
+                    .withSubject(subject)
+                    .withPlainText(
+                            String.format("%s.. Ditt mål är %s!", name, playerTarget.getTarget().getName()))
                     .buildEmail();
             emails.add(email);
         }
