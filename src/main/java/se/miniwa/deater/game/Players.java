@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
-public class Players {
+public final class Players {
     private Players() { }
 
     public static Player[] fromFile(File file) throws FileNotFoundException {

@@ -19,17 +19,28 @@ public class EmailStrategy {
         this.retryDelay = retryDelay;
     }
 
-    public void send(Email email) throws EmailException {
-        boolean done = false;
-        MailException lastEx = null;
+    public boolean addressIsValid(String address) {
+        return EmailAddressValidator.isValid(address, mailer.getEmailAddressCriteria());
+    }
 
-        for(Recipient recipient : email.getRecipients()) {
-            if(!EmailAddressValidator.isValid(recipient.getAddress(), mailer.getEmailAddressCriteria())) {
-                throw new InvalidEmailAddressException(
-                        String.format("Recipient address '%s' is invalid.", recipient.getAddress()));
+    public void send(Iterable<Email> emails) throws EmailException {
+        for(Email email : emails) {
+            for(Recipient recipient : email.getRecipients()) {
+                if(!addressIsValid(recipient.getAddress())) {
+                    throw new InvalidEmailAddressException(
+                            String.format("Recipient address '%s' is invalid.", recipient.getAddress()));
+                }
             }
         }
 
+        for(Email email : emails) {
+            send(email);
+        }
+    }
+
+    private void send(Email email) throws EmailException {
+        boolean done = false;
+        MailException lastEx = null;
         for(int i = 0; i < retryCount; i++) {
             try {
                 mailer.sendMail(email);

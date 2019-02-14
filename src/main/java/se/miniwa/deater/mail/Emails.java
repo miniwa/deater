@@ -10,11 +10,18 @@ import java.util.List;
 public final class Emails {
     private Emails() {}
 
-    public List<Email> buildTargetEmails(Iterable<PlayerTarget> targetChain) {
+    public static List<Email> buildTargetEmails(Iterable<PlayerTarget> targets) throws InvalidEmailAddressException {
         List<Email> emails = new ArrayList<>();
-        for(PlayerTarget playerTarget : targetChain) {
+        for(PlayerTarget playerTarget : targets) {
+            String name = playerTarget.getPlayer().getName();
+            String address = playerTarget.getPlayer().getEmail();
+            if(address == null) {
+                String msg = String.format("Player '%s' does not have an email address.", name);
+                throw new InvalidEmailAddressException(msg);
+            }
+
             Email email = EmailBuilder.startingBlank()
-                    .to(playerTarget.getPlayer().getEmail())
+                    .to(address)
                     .withSubject("Death Eater Game")
                     .buildEmail();
             emails.add(email);
