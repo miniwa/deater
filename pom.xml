@@ -97,6 +97,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <artifactSet>
+                        <excludes>com.google.code.findbugs:jsr305</excludes>
+                    </artifactSet>
+                </configuration>
             </plugin>
         </plugins>
     </build>
