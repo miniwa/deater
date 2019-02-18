@@ -36,7 +36,7 @@ public final class Emails {
                     .from(fromName, fromAddress)
                     .withSubject(subject)
                     .withPlainText(
-                            String.format("%s.. Ditt mål är %s!", name, playerTarget.getTarget().getName()))
+                            String.format("%s! Ditt mål är %s!", name, playerTarget.getTarget().getName()))
                     .buildEmail();
             emails.add(email);
         }
